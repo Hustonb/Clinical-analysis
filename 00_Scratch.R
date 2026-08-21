@@ -3,6 +3,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(gtsummary)
+library(car)
 
 #Import data as Tibble
 Viewraw_data <-readr::read_csv("Data/survey.csv")
@@ -36,13 +37,9 @@ clean_data <- clean_data |>
       treatment,
       levels = c("No", "Yes"),
       labels = c("No Treatment", "Treatment Pursued")
-    ),
-    treatment_binary = if_else(
-      treatment == "Yes",
-      1,
-      0
     )
   )
+
 
 #Categorical vars Gender, Country and have many unique values and can be simplified for analysis
 unique(clean_data$Gender)
@@ -57,20 +54,19 @@ clean_data <- clean_data |>
 clean_data
 
 #We see that the majority of participants were within the US, create a more useful var for analysis from this. 
-clean_data |>
-       count(Country) |>
-       arrange(desc(n))
+clean_data <- clean_data |>
+  mutate(
+    US_Respondent = factor(
+      if_else(Country == "United States", 1, 0),
+      levels = c(0, 1),
+      labels = c("No", "Yes")
+    )
+  )
+
+#remove columns we don't need for analysis towards answering the research question
 
 clean_data <- clean_data |>
-  mutate(US_Respondent=if_else(
-    Country=="United States",1,0
-  ))
-
-#remove columns we don't need for analysis towards answering my research question
-
-
-clean_data <- clean_data |>
-  select(-"Timestamp")
+  select(-"Timestamp",-"no_employees")
 
 #Looking at missing values and how to handle them
 #Leveraged View(clean_data), we see that no values that are supposed to be NA were entered incorrectly in the data
@@ -93,7 +89,11 @@ clean_data <- clean_data |>
   select(-"comments",-"state",-"work_interfere")
 
 #Descriptive statistics
-#The raw dataset contained 1259 rows. We'll be including all of these rows in our final analytic sample.
+#The raw dataset contained 1259 rows. We'll be including all of these rows except the 8 with missing ages 
+#in our final analytic sample.
+clean_data <- clean_data |>
+  filter(!is.na(Age))
+
 clean_data |>
   group_by(treatment) |>
   summarise(
@@ -137,7 +137,6 @@ table1 <- analysis_data |>
     family_history,
     US_Respondent,
     self_employed,
-    no_employees,
     remote_work,
     tech_company,
     benefits,
@@ -153,7 +152,6 @@ table1 <- analysis_data |>
       family_history ~ "Family History",
       US_Respondent ~ "US Respondent",
       self_employed ~ "Self-Employed",
-      no_employees ~ "Company Size",
       remote_work ~ "Remote Work",
       tech_company ~ "Tech Company",
       benefits ~ "Mental Health Benefits",
@@ -174,8 +172,131 @@ table1 <- analysis_data |>
   bold_labels()
 
 table1
-#need to reorder the groups within some vars, ie company size.
-#Need to think about the way we want it to display some binary categorical vars like family history. should it disp yes and no below it
-#TABLE 1 NEARLY DONE
-#Do I want to do covariance stuff before launching into modeling?
 
+#TABLE 1 NEARLY DONE
+
+#Exploratory visualization of data towards research question
+
+#dist of Age
+ggplot(
+  analysis_data, aes(Age)
+)+
+  geom_histogram()
+
+ggplot(
+  analysis_data, aes(Age,treatment)
+)+
+  geom_boxplot()
+
+ggplot(
+  data = analysis_data,
+  mapping = aes(x = Gender, fill = treatment)
+) +
+geom_bar(position = "dodge")
+
+ggplot(
+  data = analysis_data,
+  mapping = aes(x = family_history, fill = treatment)
+) +
+  geom_bar(position = "dodge")
+
+#Can make contingency tables to investigate multicollinearity between categorical independent variables
+#Some potential variables to investigate based on our domain knowledge: benefits, wellness_program, seek_help, anonymity
+
+contingencytable <- function(var1, var2) {
+  analysis_data |>
+    select({{ var1 }}, {{ var2 }}) |>
+    mutate(
+      across(
+        everything(),
+        ~ factor(.x, levels = c("Yes", "No", "Don't know"))
+      )
+    ) |>
+    table()
+}
+
+prop.table(contingencytable(benefits,wellness_program),margin=1)
+prop.table(contingencytable(benefits,seek_help),margin=1)
+prop.table(contingencytable(benefits,anonymity),margin=1)
+prop.table(contingencytable(wellness_program,seek_help),margin=1)
+prop.table(contingencytable(wellness_program,anonymity),margin=1)
+prop.table(contingencytable(seek_help,anonymity),margin=1)
+#No need for a correlation matrix since we only have one numeric predictor
+
+#The independence of observations assumption should be met as each person only has one
+#corresponding response. The one thing to watch here would be whether multiple people 
+#from the same workspace were taking this survey.
+#Vif will be used below to further confirm that the lack of multicollinearity condition
+#is met
+#Will also verify linear logit condition when fitting first model below
+
+#fit first version of log model
+model1 <- glm(treatment ~ .,
+          data = analysis_data,
+          family = "binomial"
+)
+
+# print results
+summary(model1)
+
+
+#Note that gtsummary is supposedly useful for reporting model results too when the time comes
+
+#change survey questions to factors and set reference level for modelin then refit
+analysis_data <- analysis_data |>
+  mutate(
+    benefits = factor(
+      benefits,
+      levels = c("No", "Yes", "Don't know")
+    ),
+     wellness_program= factor(
+       wellness_program,
+      levels = c("No", "Yes", "Don't know")
+    ),
+    seek_help = factor(
+      seek_help,
+      levels = c("No", "Yes", "Don't know")
+    ),
+    anonymity = factor(
+      anonymity,
+      levels = c("No", "Yes", "Don't know")
+    )
+  )
+#refit first v of model with proper reference levels
+model1 <- glm(treatment ~ .,
+              data = analysis_data,
+              family = "binomial"
+)
+
+# print results
+summary(model1)
+
+#verify model conditions
+vif_val <- as.data.frame(vif(model1))
+vif_val
+#We see that the adjusted GVIF values are well below the widely accepted threshold of 5, so we satisfy the assumption
+#of no multicollinearity for the sake of fitting log model. REWORD AS NEEDED.
+
+#linear logit condition
+logit_data <- analysis_data |>
+  mutate(
+    predicted_prob = predict(
+      model1,
+      newdata = analysis_data,
+      type = "response"
+    ),
+    log_odds = qlogis(predicted_prob)
+  )
+
+ggplot(logit_data, aes(x = Age, y = log_odds)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "loess", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Assessment of Linearity Between Age and Log-Odds",
+    x = "Age (years)",
+    y = "Log-Odds of Seeking Mental Health Treatment"
+  )
+
+#Conditions are met. next steps are to dc whether i should be removing the 18 rows which aren't producing predictions
+#And then interpret model and such.

@@ -84,7 +84,11 @@ clean_data <- clean_data |>
   select(-"comments",-"state",-"work_interfere")
 
 #Descriptive statistics
-#The raw dataset contained 1259 rows. We'll be including all of these rows in our final analytic sample.
+#The raw dataset contained 1259 rows. We'll be including all of these rows except the 8 with missing ages 
+#in our final analytic sample.
+clean_data <- clean_data |>
+  filter(!is.na(Age))
+
 clean_data |>
   group_by(treatment) |>
   summarise(
