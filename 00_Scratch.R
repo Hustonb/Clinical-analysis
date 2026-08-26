@@ -4,9 +4,10 @@ library(ggplot2)
 library(tidyr)
 library(gtsummary)
 library(car)
+library(ResourceSelection)
 
 #Import data as Tibble
-Viewraw_data <-readr::read_csv("Data/survey.csv")
+raw_data <-readr::read_csv("Data/survey.csv")
 raw_data
 #initial inspection of data
 options(scipen = 999)
@@ -88,12 +89,13 @@ clean_data |>
 clean_data <- clean_data |>
   select(-"comments",-"state",-"work_interfere")
 
-#Descriptive statistics
-#The raw dataset contained 1259 rows. We'll be including all of these rows except the 8 with missing ages 
-#in our final analytic sample.
+#The raw dataset contained 1259 rows. We'll be including all of these rows except the 8 with missing ages and 18 with 
+#missing self_employed in our final analytic sample.
 clean_data <- clean_data |>
-  filter(!is.na(Age))
+  filter(!is.na(Age) &
+           !is.na(self_employed))
 
+#Descriptive statistics
 clean_data |>
   group_by(treatment) |>
   summarise(
@@ -167,13 +169,10 @@ table1 <- analysis_data |>
   ) |>
   modify_header(
     label ~ "**Characteristic**"
-    
   ) |>
   bold_labels()
 
 table1
-
-#TABLE 1 NEARLY DONE
 
 #Exploratory visualization of data towards research question
 
@@ -242,7 +241,7 @@ summary(model1)
 
 #Note that gtsummary is supposedly useful for reporting model results too when the time comes
 
-#change survey questions to factors and set reference level for modelin then refit
+#change survey questions to factors and set reference level for modeling then refit
 analysis_data <- analysis_data |>
   mutate(
     benefits = factor(
@@ -275,7 +274,7 @@ summary(model1)
 vif_val <- as.data.frame(vif(model1))
 vif_val
 #We see that the adjusted GVIF values are well below the widely accepted threshold of 5, so we satisfy the assumption
-#of no multicollinearity for the sake of fitting log model. REWORD AS NEEDED.
+#of no multi-collinearity for the sake of fitting log model. REWORD AS NEEDED.
 
 #linear logit condition
 logit_data <- analysis_data |>
@@ -298,5 +297,94 @@ ggplot(logit_data, aes(x = Age, y = log_odds)) +
     y = "Log-Odds of Seeking Mental Health Treatment"
   )
 
-#Conditions are met. next steps are to dc whether i should be removing the 18 rows which aren't producing predictions
-#And then interpret model and such.
+#Interpret model. maybe fit univariate for each? var? 
+#remember that this isn't too much of a ML project and we don't care much about the models predictive power or anything
+#
+univariable_results <- analysis_data |>
+  tbl_uvregression(
+    method = glm,
+    y = treatment,
+    method.args = list(family = binomial),
+    exponentiate = TRUE,
+    label = list(
+      Age ~ "Age",
+      Gender ~ "Gender",
+      family_history ~ "Family History",
+      US_Respondent ~ "US Respondent",
+      self_employed ~ "Self-Employed",
+      remote_work ~ "Remote Work",
+      tech_company ~ "Tech Company",
+      benefits ~ "Mental Health Benefits",
+      wellness_program ~ "Wellness Program",
+      seek_help ~ "Resources for Seeking Help",
+      anonymity ~ "Anonymity Protections"
+    )
+  ) |>
+  modify_column_merge(
+    pattern = "{estimate} ({ci})",
+    rows = !is.na(estimate)
+  ) |>
+  modify_header(
+    estimate = "**OR (95% CI)**"
+  ) |>
+  modify_column_hide(
+    columns = c(ci, conf.low, conf.high)
+  )
+
+#fit uv regression like above and make gtsummary table from it then merge with table for mv log regression
+#mv reg table
+multivariable_results <- tbl_regression(
+  model1,
+  exponentiate = TRUE,
+  label = list(
+    Age ~ "Age",
+    Gender ~ "Gender",
+    family_history ~ "Family History",
+    US_Respondent ~ "US Respondent",
+    self_employed ~ "Self-Employed",
+    remote_work ~ "Remote Work",
+    tech_company ~ "Tech Company",
+    benefits ~ "Mental Health Benefits",
+    wellness_program ~ "Wellness Program",
+    seek_help ~ "Resources for Seeking Help",
+    anonymity ~ "Anonymity Protections"
+  )
+) |>
+  modify_column_merge(
+    pattern = "{estimate} ({ci})",
+    rows = !is.na(estimate)
+  ) |>
+  modify_header(
+    estimate = "**OR (95% CI)**"
+  ) |>
+  modify_column_hide(
+    columns = c(ci, conf.low, conf.high)
+  )
+
+tbl_merge(
+  tbls = list(univariable_results,multivariable_results),
+  tab_spanner = c("**Univariable**","**Multivariable**")
+) |>
+  modify_column_hide(columns="stat_n_1")|>
+  bold_labels()
+hoslem.test(
+  analysis_data$treatment,
+  fitted(model1),
+  g = 10
+)
+
+model_data <- model.frame(model1)
+
+treatment_numeric <- if_else(
+  model_data$treatment == "Treatment Pursued",
+  1,
+  0
+)
+
+hoslem.test(
+  treatment_numeric,
+  fitted(model1),
+  g = 10
+)
+#p-value of 0.3762>.05 so there's no statistically sig evidence of lack of fit based on the Hosmer-Lemeshow goodness
+#of fit test.

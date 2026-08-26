@@ -3,7 +3,9 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(gtsummary)
+library(car)
+library(ResourceSelection)
 
 #Import data as Tibble
-Viewraw_data <-readr::read_csv("Data/survey.csv")
+raw_data <-readr::read_csv("Data/survey.csv")
 raw_data
