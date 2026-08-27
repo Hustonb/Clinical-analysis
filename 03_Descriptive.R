@@ -1,4 +1,5 @@
-#EDA
+#Exploration of data     CLEAN UP THESE PLOTS FOR FINAL PRESENTATION. titles, color coded with colorblindness in mind,
+#col and legend labels. maybe add one more interesting viz to look at.
 clean_data |>
   group_by(treatment) |>
   summarise(
@@ -14,11 +15,49 @@ ggplot(
 ) +
   geom_histogram()
 
-#The final step in preparing our data for analysis, we exclude columns that aren't relevant in predicting the research question
-#Cols that don't relate to demographics of survey participants or workplace characteristics will be removed.
+ggplot(
+  analysis_data, aes(Age,treatment)
+) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Age by Treatment.",
+    y= "Treatment"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+okabe_ito <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
+ggplot(
+  data = analysis_data,
+  mapping = aes(x = Gender, fill = treatment)
+) +
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = okabe_ito)+
+  labs(
+    title = "Count of Treatment Pursued by Gender.",
+    y= "Count",
+    fill="Treatment"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggplot(
+  data = analysis_data,
+  mapping = aes(x = family_history, fill = treatment)
+) +
+  geom_bar(position = "dodge")  +
+  scale_fill_manual(values = okabe_ito)+
+  labs(
+    title = "Count of Treatment Pursued by Family History.",
+    x="Family History",
+    y= "Count",
+    fill="Treatment"
+  ) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+#The final step in preparing data for analysis is to exclude columns that aren't relevant in predicting the research 
+#question. Cols that don't relate to demographics of survey participants or workplace characteristics will be removed.
 #care_options just describes whether the employee knows what mental health options their workplace offers for healthcare.
 #Cols such as mental_health_consequence will be removed as they detail someones perception of workplace attitude
-#towards mental health, not a characteristic of the workplace they exist in.
+#towards mental health, not a characteristic of the workplace they're in.
 analysis_data <- clean_data |>
   select(
     -Country,
@@ -34,6 +73,7 @@ analysis_data <- clean_data |>
     -obs_consequence
   )
 
+#Create table1 to explore data and present in journal
 table1 <- analysis_data |>
   select(
     treatment,
@@ -76,28 +116,3 @@ table1 <- analysis_data |>
   bold_labels()
 
 table1
-
-#Exploratory visualization of data towards research question
-
-#dist of Age
-ggplot(
-  analysis_data, aes(Age)
-)+
-  geom_histogram()
-
-ggplot(
-  analysis_data, aes(Age,treatment)
-)+
-  geom_boxplot()
-
-ggplot(
-  data = analysis_data,
-  mapping = aes(x = Gender, fill = treatment)
-) +
-  geom_bar(position = "dodge")
-
-ggplot(
-  data = analysis_data,
-  mapping = aes(x = family_history, fill = treatment)
-) +
-  geom_bar(position = "dodge")

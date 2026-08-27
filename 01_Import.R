@@ -6,6 +6,5 @@ library(gtsummary)
 library(car)
 library(ResourceSelection)
 
-#Import data as Tibble
+#Import data as tibble
 raw_data <-readr::read_csv("Data/survey.csv")
-raw_data
