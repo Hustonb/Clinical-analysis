@@ -1,0 +1,24 @@
+---
+title: "TreatmentAnalysis"
+format: html
+editor: visual
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r}
+#| include: false
+source("01_Import.R")
+source("02_Preprocessing.R")
+source("03_Descriptive.R")
+source("04_Modeling.R")
+## Quarto
+```
+
+## Scratch
+
+```{r}
+table1
+```
