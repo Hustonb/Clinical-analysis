@@ -66,7 +66,19 @@ model1 <- glm(treatment ~ .,
 summary(model1)
 
 #Now verify model conditions:
-vif_val <- as.data.frame(vif(model1))
+vif_val <- as.data.frame(vif(model1)) |>
+  tibble::rownames_to_column("Variable") |>
+  gt() |>
+  cols_label(
+    Variable = "Predictor",
+    GVIF = "GVIF",
+    Df = "Degrees of Freedom",
+    `GVIF^(1/(2*Df))` = "Adjusted GVIF"
+  ) |>
+  fmt_number(
+    columns = c(GVIF, `GVIF^(1/(2*Df))`),
+    decimals = 2
+  )
 vif_val
 #We see that the adjusted GVIF values are well below the widely used threshold of 5, so we satisfy the assumption
 #of no multicollinearity for the sake of fitting the logistic model.
@@ -82,7 +94,7 @@ logit_data <- analysis_data |>
     log_odds = qlogis(predicted_prob)
   )
 
-ggplot(logit_data, aes(x = Age, y = log_odds)) +
+linearity_of_logit <- ggplot(logit_data, aes(x = Age, y = log_odds)) +
   geom_point(alpha = 0.3) +
   geom_smooth(method = "loess", se = FALSE) +
   geom_smooth(method = "lm", se = FALSE) +
@@ -92,6 +104,8 @@ ggplot(logit_data, aes(x = Age, y = log_odds)) +
     y = "Log-Odds of Seeking Mental Health Treatment"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
+
+linearity_of_logit
 
 #Create table displaying odds ratios (univariable model and multivariable) for each variable
 univariable_results <- analysis_data |>
@@ -153,12 +167,14 @@ multivariable_results <- tbl_regression(
     columns = c(ci, conf.low, conf.high)
   )
 
-tbl_merge(
+OR_tbl<-tbl_merge(
   tbls = list(univariable_results,multivariable_results),
   tab_spanner = c("**Univariable**","**Multivariable**")
 ) |>
   modify_column_hide(columns="stat_n_1")|>
   bold_labels()
+
+OR_tbl
 
 model_data <- model.frame(model1)
 

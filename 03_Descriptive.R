@@ -1,5 +1,4 @@
-#Exploration of data     CLEAN UP THESE PLOTS FOR FINAL PRESENTATION. titles, color coded with colorblindness in mind,
-#col and legend labels. maybe add one more interesting viz to look at.
+#Exploration of data
 clean_data |>
   group_by(treatment) |>
   summarise(
@@ -15,43 +14,49 @@ ggplot(
 ) +
   geom_histogram()
 
-ggplot(
-  analysis_data, aes(Age,treatment)
+age_by_treatment <- ggplot(
+  clean_data, aes(Age,treatment)
 ) +
   geom_boxplot() +
   labs(
-    title = "Distribution of Age by Treatment.",
+    title = "Distribution of Age by Treatment",
     y= "Treatment"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 
+age_by_treatment
+
 okabe_ito <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
-ggplot(
-  data = analysis_data,
+treatment_by_gender <- ggplot(
+  data = clean_data,
   mapping = aes(x = Gender, fill = treatment)
 ) +
   geom_bar(position = "dodge") +
   scale_fill_manual(values = okabe_ito)+
   labs(
-    title = "Count of Treatment Pursued by Gender.",
+    title = "Count of Treatment Pursued by Gender",
     y= "Count",
     fill="Treatment"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
 
-ggplot(
-  data = analysis_data,
+treatment_by_gender
+
+treatment_by_history <-ggplot(
+  data = clean_data,
   mapping = aes(x = family_history, fill = treatment)
 ) +
   geom_bar(position = "dodge")  +
   scale_fill_manual(values = okabe_ito)+
   labs(
-    title = "Count of Treatment Pursued by Family History.",
+    title = "Count of Treatment Pursued by Family History",
     x="Family History",
     y= "Count",
     fill="Treatment"
   ) +
   theme(plot.title = element_text(hjust = 0.5))
+
+treatment_by_history
 
 #The final step in preparing data for analysis is to exclude columns that aren't relevant in predicting the research 
 #question. Cols that don't relate to demographics of survey participants or workplace characteristics will be removed.

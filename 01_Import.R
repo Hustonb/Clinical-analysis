@@ -2,6 +2,7 @@
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(gt)
 library(gtsummary)
 library(car)
 library(ResourceSelection)
