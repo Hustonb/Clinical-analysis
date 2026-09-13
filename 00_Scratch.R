@@ -273,8 +273,7 @@ summary(model1)
 #verify model conditions
 vif_val <- as.data.frame(vif(model1))
 vif_val
-#We see that the adjusted GVIF values are well below the widely accepted threshold of 5, so we satisfy the assumption
-#of no multi-collinearity for the sake of fitting log model. REWORD AS NEEDED.
+#We see that the adjusted GVIF values are well below the widely accepted threshold of 5.
 
 #linear logit condition
 logit_data <- analysis_data |>
