@@ -113,20 +113,7 @@ univariable_results <- analysis_data |>
     method = glm,
     y = treatment,
     method.args = list(family = binomial),
-    exponentiate = TRUE,
-    label = list(
-      Age ~ "Age",
-      Gender ~ "Gender",
-      family_history ~ "Family History",
-      US_Respondent ~ "US Respondent",
-      self_employed ~ "Self-Employed",
-      remote_work ~ "Remote Work",
-      tech_company ~ "Tech Company",
-      benefits ~ "Mental Health Benefits",
-      wellness_program ~ "Wellness Program",
-      seek_help ~ "Resources for Seeking Help",
-      anonymity ~ "Anonymity Protections"
-    )
+    exponentiate = TRUE
   ) |>
   modify_column_merge(
     pattern = "{estimate} ({ci})",
@@ -141,20 +128,7 @@ univariable_results <- analysis_data |>
 
 multivariable_results <- tbl_regression(
   model1,
-  exponentiate = TRUE,
-  label = list(
-    Age ~ "Age",
-    Gender ~ "Gender",
-    family_history ~ "Family History",
-    US_Respondent ~ "US Respondent",
-    self_employed ~ "Self-Employed",
-    remote_work ~ "Remote Work",
-    tech_company ~ "Tech Company",
-    benefits ~ "Mental Health Benefits",
-    wellness_program ~ "Wellness Program",
-    seek_help ~ "Resources for Seeking Help",
-    anonymity ~ "Anonymity Protections"
-  )
+  exponentiate = TRUE
 ) |>
   modify_column_merge(
     pattern = "{estimate} ({ci})",

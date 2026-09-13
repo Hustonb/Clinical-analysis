@@ -34,7 +34,7 @@ treatment_by_gender <- ggplot(
   geom_bar(position = "dodge") +
   scale_fill_manual(values = okabe_ito)+
   labs(
-    title = "Count of Treatment Pursued by Gender",
+    title = "Count of Treatment by Gender",
     y= "Count",
     fill="Treatment"
   ) +
@@ -49,7 +49,7 @@ treatment_by_history <-ggplot(
   geom_bar(position = "dodge")  +
   scale_fill_manual(values = okabe_ito)+
   labs(
-    title = "Count of Treatment Pursued by Family History",
+    title = "Count of Treatment by Family History",
     x="Family History",
     y= "Count",
     fill="Treatment"
@@ -96,19 +96,6 @@ table1 <- analysis_data |>
   ) |>
   tbl_summary(
     by = treatment,
-    label = list(
-      Age ~ "Age",
-      Gender ~ "Gender",
-      family_history ~ "Family History",
-      US_Respondent ~ "US Respondent",
-      self_employed ~ "Self-Employed",
-      remote_work ~ "Remote Work",
-      tech_company ~ "Tech Company",
-      benefits ~ "Mental Health Benefits",
-      wellness_program ~ "Wellness Program",
-      seek_help ~ "Resources for Seeking Help",
-      anonymity ~ "Anonymity Protections"
-    ),
     statistic = list(
       all_continuous() ~ "{mean} ({sd})",
       all_categorical() ~ "{n} ({p}%)"
