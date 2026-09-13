@@ -33,8 +33,8 @@ Source: [Kaggle – Mental Health in Tech Survey](https://www.kaggle.com/dataset
 
 ## Methods
 - Import data
-- Data preprocessing/Address missingness
-- Data Exploration and visualization
+- Data preprocessing/address missingness
+- Data exploration and visualization
 - Statistical analysis
 - Verify logistic regression model assumptions
 - Asses multicollinearity with VIF and GVIF
