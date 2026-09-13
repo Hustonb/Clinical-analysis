@@ -6,7 +6,7 @@
 
 ## Overview
 
-This project seeks to investigate the associations between different demographic and workplace predictors on whether or not individuals seek out treatment for mental health issues in tech workplaces.
+This project seeks to investigate the associations between different demographic and workplace predictors and whether individuals seek out treatment for mental health issues in tech workplaces.
 
 The analysis uses data from the 2014 Mental Health in Tech Survey
 conducted by Open Sourcing Mental Illness (OSMI).
