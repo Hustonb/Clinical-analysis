@@ -2,7 +2,7 @@
 
 ## Link to Final Analysis/Report
 
-**[View the full analysis](https://hustonb.github.io/Clinical-analysis/)**
+**[View the report here](https://hustonb.github.io/Clinical-analysis/)**
 
 ## Overview
 
