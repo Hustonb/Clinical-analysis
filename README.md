@@ -32,14 +32,14 @@ participated in OSMI's 2014 Mental Health in Tech Survey.
 Source: [Kaggle – Mental Health in Tech Survey](https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey)
 
 ## Methods
--Import data
--Data preprocessing/Address missingness
--Data Exploration and visualization
--Statistical analysis
--Verify logistic regression model assumptions
--Asses multicollinearity with VIF and GVIF
--Fit univariable and multivariable logistic regression models
--Hosmer-Lemeshow goodness of fit test
+- Import data
+- Data preprocessing/Address missingness
+- Data Exploration and visualization
+- Statistical analysis
+- Verify logistic regression model assumptions
+- Asses multicollinearity with VIF and GVIF
+- Fit univariable and multivariable logistic regression models
+- Hosmer-Lemeshow goodness of fit test
 
 ## Key Findings
 
@@ -47,8 +47,8 @@ Source: [Kaggle – Mental Health in Tech Survey](https://www.kaggle.com/dataset
   participants.
 - Participants with a family history of mental illness had higher
   odds of seeking treatment.
-- Workplace characteristics showed comparatively limited evidence
- of independent associations after adjustment.
+- Workplace characteristics yielded limited associations of interest after
+  adjustement for other predictors.
 
 ## Repository Structure
 
