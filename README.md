@@ -2,7 +2,7 @@
 
 ## Link to Final Analysis/Report
 
-ADD LINK HERE
+**ADD LINK HERE**
 
 ## Overview
 
@@ -10,6 +10,15 @@ This project seeks to investigate the associations between different demographic
 
 The analysis uses data from the 2014 Mental Health in Tech Survey
 conducted by Open Sourcing Mental Illness (OSMI).
+
+## Tools
+
+- R
+- RStudio
+- Quarto
+- ggplot2
+- dplyr
+- gt
 
 ## Research Question
 
@@ -43,27 +52,11 @@ Source: [Kaggle – Mental Health in Tech Survey](https://www.kaggle.com/dataset
 
 ## Repository Structure
 
-- `R/01_import.R` – Data import
-- `R/02_cleaning.R` – Data cleaning and preprocessing
-- `R/03_descriptive.R` – Descriptive analysis and visualization
-- `R/04_modeling.R` – Logistic regression modeling
-- `R/05_diagnostics.R` – Model diagnostics
+- `R/01_Import.R` – Data import
+- `R/02_Cleaning.R` – Data cleaning and preprocessing
+- `R/03_Descriptive.R` – Descriptive analysis and visualization
+- `R/04_Modeling.R` – Logistic regression modeling
 - `TreatmentAnalysis.qmd` – Reproducible report
-
-## Full Analysis
-
-**[View the full analysis report](YOUR-GITHUB-PAGES-LINK)**
-
-## Tools
-
-- R
-- RStudio
-- Quarto
-- ggplot2
-- dplyr
-- gtsummary
-- gt
-- car
 
 ## Author
 
