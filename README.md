@@ -1,4 +1,4 @@
-# Associations Between Demographic and Workplace Characteristics and Treatment Seeking Behavior for Mental Health Issues in Tech Workplaces.
+# Mental Health Treatment-Seeking Among Technology Professionals.
 
 ## Link to Final Analysis/Report
 
